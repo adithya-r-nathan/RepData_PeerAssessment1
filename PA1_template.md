@@ -9,19 +9,13 @@ output:
 ## Loading and preprocessing the data
 Unzip data to obtain a csv file.
 
-
 ```r
 unzip("activity.zip",exdir = "data")
-```
-
-```
-## Warning in unzip("activity.zip", exdir = "data"): error 1 in extracting from zip
-## file
 ```
 Reading the data into activity data frame and show some summary statistics
 
 ```r
-activity <- read.csv("activity.csv", stringsAsFactors=FALSE)
+activity <- read.csv("data/activity.csv", stringsAsFactors=FALSE)
 str(activity)
 ```
 
@@ -60,7 +54,7 @@ str(activity)
 ```
 ## 'data.frame':	17568 obs. of  3 variables:
 ##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ date    : POSIXct, format: "2012-10-01" "2012-10-01" ...
 ##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
@@ -74,20 +68,20 @@ total_day <- activity %>% group_by(date) %>%summarise(total_steps=sum(steps,na.r
 ```
 
 ```
-## # A tibble: 61 x 3
-##    date       total_steps    na
-##    <date>           <int> <dbl>
-##  1 2012-10-01           0     1
-##  2 2012-10-02         126     0
-##  3 2012-10-03       11352     0
-##  4 2012-10-04       12116     0
-##  5 2012-10-05       13294     0
-##  6 2012-10-06       15420     0
-##  7 2012-10-07       11015     0
-##  8 2012-10-08           0     1
-##  9 2012-10-09       12811     0
-## 10 2012-10-10        9900     0
-## # ... with 51 more rows
+## Source: local data frame [61 x 3]
+## 
+##          date total_steps na
+## 1  2012-10-01           0  1
+## 2  2012-10-02         126  0
+## 3  2012-10-03       11352  0
+## 4  2012-10-04       12116  0
+## 5  2012-10-05       13294  0
+## 6  2012-10-06       15420  0
+## 7  2012-10-07       11015  0
+## 8  2012-10-08           0  1
+## 9  2012-10-09       12811  0
+## 10 2012-10-10        9900  0
+## ..        ...         ... ..
 ```
 Visualise the total number of steps taken per day as a barplot
 
@@ -100,7 +94,7 @@ text(x = 0,y=median(total_day$total_steps),pos=3,labels = "median")
 text(x = 0,y=mean(total_day$total_steps),pos=1,labels = "mean",col="red")
 ```
 
-![](PA1_template_files/figure-html/barplot-1.png)<!-- -->
+![plot of chunk barplot](figure/barplot-1.png) 
 
 ####  2. Make a histogram of the total number of steps taken each day
 
@@ -113,7 +107,7 @@ abline(v=median(total_day$total_steps),lty=3, lwd=2, col="black")
 legend(legend="median","topright",lty=3,lwd=2,bty = "n")
 ```
 
-![](PA1_template_files/figure-html/histogram-1.png)<!-- -->
+![plot of chunk histogram](figure/histogram-1.png) 
 
 #### 3. Calculate and report the mean and median of the total number of steps taken per day
 
@@ -122,7 +116,7 @@ legend(legend="median","topright",lty=3,lwd=2,bty = "n")
 mean_steps <- mean(total_day$total_steps,na.rm=TRUE)
 median_steps <- median(total_day$total_steps,na.rm=TRUE)
 ```
-Mean and median of the total number of steps taken per day are 1.076619\times 10^{4} steps and 10765 steps, respectively.
+Mean and median of the total number of steps taken per day are 1.076619 &times; 10<sup>4</sup> steps and 10765 steps, respectively.
 
 ## What is the average daily activity pattern?
 
@@ -132,13 +126,6 @@ Mean and median of the total number of steps taken per day are 1.076619\times 10
 ```r
 library(dplyr,quietly = TRUE)
 daily_patterns <- activity %>% group_by(interval) %>% summarise(average=mean(steps,na.rm=TRUE))
-```
-
-```
-## `summarise()` ungrouping output (override with `.groups` argument)
-```
-
-```r
 plot(x = 1:nrow(daily_patterns),y = daily_patterns$average,type = "l",
      col = "red", xaxt = "n",xlab="Intervals", 
      ylab = "Average for given interval across all days")
@@ -146,7 +133,7 @@ axis(1,labels=daily_patterns$interval[seq(1,288,12)],
      at = seq_along(daily_patterns$interval)[seq(1,288,12)])
 ```
 
-![](PA1_template_files/figure-html/daily-1.png)<!-- -->
+![plot of chunk daily](figure/daily-1.png) 
 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -230,19 +217,12 @@ mean(check$ok)
 
 ```r
 total_day_noNAs <- activity_without_NAs %>% mutate(steps_no_NAs=as.numeric(steps_no_NAs)) %>% group_by(date) %>% summarise(total_steps=sum(steps_no_NAs))
-```
-
-```
-## `summarise()` ungrouping output (override with `.groups` argument)
-```
-
-```r
 hist(total_day_noNAs$total_steps,col="blue",breaks=20,main="Total steps per day",xlab="Steps per day")
 abline(v=median(total_day$total_steps),lty=3, lwd=2, col="black")
 legend(legend="median","topright",lty=3,lwd=2,bty = "n")
 ```
 
-![](PA1_template_files/figure-html/histogram_no_NAs-1.png)<!-- -->
+![plot of chunk histogram_no_NAs](figure/histogram_no_NAs-1.png) 
 
 
 ```r
@@ -251,7 +231,7 @@ summary(total_day_noNAs$total_steps)
 
 ```
 ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##      41    9819   10766   10766   12811   21194
+##      41    9819   10770   10770   12810   21190
 ```
 
 Imputing missing values, mean of the total number of steps taken per day  increased while median decreased,compared to estimates from the first part (ingoring missing values). Imputing missing data resulted in increase of total daily number of steps (instead of each NAs we have average that is always >=0)
@@ -288,14 +268,7 @@ table(activity_without_NAs$day)
 ```r
 library(ggplot2)
 daily_patterns <- activity_without_NAs %>% mutate(day=factor(day,levels=c("weekend","weekday")),steps_no_NAs=as.numeric(steps_no_NAs)) %>% group_by(interval,day) %>% summarise(average=mean(steps_no_NAs))
-```
-
-```
-## `summarise()` regrouping output by 'interval' (override with `.groups` argument)
-```
-
-```r
 qplot(interval,average,data=daily_patterns,geom="line",facets=day~.)
 ```
 
-![](PA1_template_files/figure-html/weekend_comparison-1.png)<!-- -->
+![plot of chunk weekend_comparison](figure/weekend_comparison-1.png) 
